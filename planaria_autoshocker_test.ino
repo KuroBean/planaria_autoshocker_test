@@ -1,25 +1,20 @@
-#include <Servo.h>
+
 int count = 0;
 #define uv 5
 #define led 7
 #define shock 12
-#define buzzer 2
-#define servo 4
 
 #define uvStrength 255
 #define uvTest false
-
+#define initialRun false
 //DATA RECORDING
-#define isRecordingUV false
-#define isRecordingShock true
+#define isRecordingUV true
+#define isRecordingShock false
 #define shockDuration 300
 #define uvDuration 3000//for tail cond test:3000
 #define recordDuration 5000 //duration of each recording in msec, for tail cond test: 14000
-#define recordNum 20 //how many recordings 
-#define waitMinute 2 //wait time between trials (in minutes)
-
-#define servoDefaultAng 120
-#define servoEndAng 165 //servo: vertically up is 90 deg otu of 180, + is clockwise from servo pov
+#define recordNum 3 //how many recordings 
+#define waitMinute 0.25 //wait time between trials (in minutes)
 
 #define shockOnly false
 #define autoMode false
@@ -32,19 +27,22 @@ int count = 0;
 //bigSereisTimeGapMinutes to be 6hr 38min for each day to have 3 big series, assuming (32min+10min)*2 per big series
 #define bigSeriesTimeGapMinutes 38//the thing said above
 
-#define initialRun false
-Servo servy;
+
+
+void record() {
+  Serial.println("START_RECORDING");
+  delay(500);
+}
+
 void setup() {
   // put your setup code here, to run once:
 
   pinMode(uv, OUTPUT);
   pinMode(shock, OUTPUT);
   pinMode(led, OUTPUT);
-  pinMode(buzzer, OUTPUT);
-  servy.attach(servo);
-  servy.write(servoDefaultAng);
+ 
   Serial.begin(9600);
-  delay(1000);
+  delay(7000);//10 SEC WAIT TO GET OTHER PROGRAM STARTED
 
 
   if (!uvTest && initialRun) {
@@ -103,41 +101,17 @@ void setup() {
 
     digitalWrite(shock, HIGH);
     delay(1000);//buzz(1000,2);
-    digitalWrite(buzzer, LOW);
     digitalWrite(shock, LOW);
 
   }
   else if (isRecordingUV) {
     digitalWrite(led, HIGH);
     for (int i = 0; i < recordNum; i++) {
-      //servo: vertical/upward pointing= 90 deg out of 180, + is away from you
-      //first click
-      for (int d = servoDefaultAng; d <= servoEndAng; d++) {
-        servy.write(d);
-        delay(7);
-        Serial.println(d);
-      }
-      servy.write(servoDefaultAng);
-      delay(80);//part of wait for recording button to load and actually begin, was 140-->100-->80
+      record();
       analogWrite(uv, uvStrength);//meanwhile turn on slightly early for camera to get used to brightness
       delay(uvDuration + 200);
 
-      
-      digitalWrite(uv, LOW);//CHANGED CODE TO ADD UV DURATION VS RECORD TIME DIFFERENCE BUT BEWARE WHEN RECORDTIME=UVTIME
-
-      //recording wait
-      if (recordDuration - 140 - uvDuration >= 0) {
-        delay(recordDuration - 140 - uvDuration); //-200 constant for lag after
-      }
-      
-      
-      //tap to stop
-      for (int d = servoDefaultAng; d <= servoEndAng; d++) {
-        servy.write(d);
-        delay(7);
-      }
-      servy.write(servoDefaultAng);
-      delay(690);
+      digitalWrite(uv, LOW);
       
       //delay between recordings
       for (int i = 0; i < 60; i++) {
@@ -147,25 +121,11 @@ void setup() {
   } else if (isRecordingShock) {
     digitalWrite(led, HIGH);
     for (int i = 0; i < recordNum; i++) {
-      //servo: vertical/upward pointing= 90 deg out of 180, + is away from you
-      //first click
-      for (int d = servoDefaultAng; d <= servoEndAng; d++) {
-        servy.write(d);
-        delay(7);
-      }
-      servy.write(servoDefaultAng);
-      delay(460);//WAS 250, part of wait for recording button to load and actually begin
+      record();
       digitalWrite(shock, HIGH);//meanwhile turn on slightly early for camera to get used to brightness
       //recording wait
       delay(shockDuration);
       digitalWrite(shock, LOW);
-      delay(recordDuration - 200 - shockDuration); //-200 constant for lag after
-      for (int d = servoDefaultAng; d <= servoEndAng; d++) {
-        servy.write(d);
-        delay(7);
-      }
-      servy.write(servoDefaultAng);
-      delay(690);
       digitalWrite(uv, LOW);
 
       //delay between recordings
