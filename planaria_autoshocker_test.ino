@@ -5,20 +5,25 @@ int count = 0;
 #define shock 12
 
 #define uvStrength 255
-#define uvTest false
-#define initialRun false
-//DATA RECORDING
-#define isRecordingUV true
-#define isRecordingShock false
-#define shockDuration 300
-#define uvDuration 3000//for tail cond test:3000
-#define recordDuration 5000 //duration of each recording in msec, for tail cond test: 14000
-#define recordNum 3 //how many recordings 
-#define waitMinute 0.25 //wait time between trials (in minutes)
 
+#define test false
+#define uvTest false
 #define shockOnly false
+#define initialRun false
 #define autoMode false
-#define shockTimes 1//30 //per series
+//DATA RECORDING
+#define isRecordingUV false
+#define isRecordingShock false
+
+
+#define shockDuration 50//was 300
+#define uvDuration 3000//for tail cond test:3000
+//#define recordDuration 5000 //duration of each recording in msec, for tail cond test: 14000
+#define recordNum 30 //how many recordings 
+#define waitMinute 1 //wait time between trials (in minutes)
+
+
+#define shockTimes 1//30 // trials per series
 #define seriesTimes 1//2
 #define bigSeriesTimes 1//12
 #define cooldown 60000 //cool down time after each trial, msec
@@ -31,7 +36,7 @@ int count = 0;
 
 void record() {
   Serial.println("START_RECORDING");
-  delay(500);
+  delay(1230);//1230 for gucci
 }
 
 void setup() {
@@ -42,7 +47,7 @@ void setup() {
   pinMode(led, OUTPUT);
  
   Serial.begin(9600);
-  delay(7000);//10 SEC WAIT TO GET OTHER PROGRAM STARTED
+  
 
 
   if (!uvTest && initialRun) {
@@ -55,10 +60,10 @@ void setup() {
         Serial.println(i + 1);
         for (int m = 0; m < shockTimes; m++) {
           digitalWrite(uv, HIGH);
-          delay(2000);
+          delay(uvDuration-shockDuration);
           digitalWrite(shock, HIGH);
           digitalWrite(led, HIGH);
-          delay(300);
+          delay(shockDuration);
           digitalWrite(shock, LOW);
           digitalWrite(led, LOW);
           digitalWrite(uv, LOW);
@@ -75,6 +80,7 @@ void setup() {
       
       for (int hours = 0; hours < bigSeriesTimeGapHours; hours++) {
         //belwo delays 1 hour
+        Serial.println(String(hours) + " hours and " + String(bigSeriesTimeGapMinutes) + " left til next big series");
         for (int mi = 0; mi < 60; mi++) {
           for (int sec = 0; sec < 60; sec++) {
             delay(1000);
@@ -96,15 +102,16 @@ void setup() {
     digitalWrite(uv, LOW);
   }
   else if (shockOnly) {
-
     digitalWrite(led, HIGH);
 
     digitalWrite(shock, HIGH);
-    delay(1000);//buzz(1000,2);
+    delay(shockDuration);//buzz(1000,2);
     digitalWrite(shock, LOW);
 
   }
   else if (isRecordingUV) {
+    delay(7000);//7 SEC WAIT TO GET OTHER PROGRAM STARTED
+
     digitalWrite(led, HIGH);
     for (int i = 0; i < recordNum; i++) {
       record();
@@ -119,14 +126,15 @@ void setup() {
       }
     }
   } else if (isRecordingShock) {
-    digitalWrite(led, HIGH);
+    delay(7000);//7 SEC WAIT TO GET OTHER PROGRAM STARTED
     for (int i = 0; i < recordNum; i++) {
       record();
       digitalWrite(shock, HIGH);//meanwhile turn on slightly early for camera to get used to brightness
+      digitalWrite(led, HIGH);
       //recording wait
       delay(shockDuration);
       digitalWrite(shock, LOW);
-      digitalWrite(uv, LOW);
+      digitalWrite(led, LOW);
 
       //delay between recordings
       for (int i = 0; i < 60; i++) {
