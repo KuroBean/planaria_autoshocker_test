@@ -9,34 +9,34 @@ int count = 0;
 #define test false
 #define uvTest false
 #define shockOnly false
-#define initialRun false
+#define initialRun true //conditioning
 #define autoMode false
 //DATA RECORDING
 #define isRecordingUV false
 #define isRecordingShock false
 
 
-#define shockDuration 50//was 300
+#define shockDuration 100//was 300
 #define uvDuration 3000//for tail cond test:3000
 //#define recordDuration 5000 //duration of each recording in msec, for tail cond test: 14000
-#define recordNum 30 //how many recordings 
-#define waitMinute 1 //wait time between trials (in minutes)
+#define recordNum 20 //how many recordings 
+#define waitMinute 2 //wait time between trials (in minutes)
 
 
-#define shockTimes 1//30 // trials per series
-#define seriesTimes 1//2
-#define bigSeriesTimes 1//12
-#define cooldown 60000 //cool down time after each trial, msec
+#define shockTimes 30 // trials per series
+#define seriesTimes 2
+#define bigSeriesTimes 10
+#define cooldown 120000 //cool down time after each trial, msec
 #define minutes 10 //cool down after series of trials in minutes
-#define bigSeriesTimeGapHours 6//hours of time gap between each big series, should add with 
+#define bigSeriesTimeGapHours 11//hours of time gap between each big series, should add with 
 //bigSereisTimeGapMinutes to be 6hr 38min for each day to have 3 big series, assuming (32min+10min)*2 per big series
-#define bigSeriesTimeGapMinutes 38//the thing said above
+#define bigSeriesTimeGapMinutes 27//the thing said above
 
 
 
 void record() {
   Serial.println("START_RECORDING");
-  delay(1230);//1230 for gucci
+  delay(1400);//1230 for bleeding edge timing
 }
 
 void setup() {
@@ -48,8 +48,6 @@ void setup() {
  
   Serial.begin(9600);
   
-
-
   if (!uvTest && initialRun) {
 
     for (int b = 0; b < bigSeriesTimes; b++) {//for each big series, should be 1 morning, afternoon, and night, 3 per day
